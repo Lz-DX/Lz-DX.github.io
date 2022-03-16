@@ -1,0 +1,1532 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="改善神经网络：超参数调试、正则化以及优化, Welcome to my blog">
+    <meta name="description" content="一、初始化参数对一个三层神经网络（neural network)进行参数初始化,神经网络两个隐藏层的激活函数为Relu函数，输出层为Sigmoid函数。分别采用三种不同的方式，第一种是将初始化参数全部设置为0，第二种是随机生成初始化参数，第">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>改善神经网络：超参数调试、正则化以及优化 | Welcome to my blog</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<meta name="generator" content="Hexo 6.0.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">Welcome to my blog</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>主页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于我</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>联系我</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Welcome to my blog</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			主页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于我
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			联系我
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/Lz-DX" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/Lz-DX" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/20.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">改善神经网络：超参数调试、正则化以及优化</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/deep-learning/">
+                                <span class="chip bg-color">deep learning</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2022-03-16
+                </div>
+                
+
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    3.1k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    16 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="一、初始化参数"><a href="#一、初始化参数" class="headerlink" title="一、初始化参数"></a>一、初始化参数</h1><p>对一个三层神经网络（neural network)进行参数初始化,神经网络两个隐藏层的激活函数为Relu函数，输出层为Sigmoid函数。分别采用三种不同的方式，第一种是将初始化参数全部设置为0，第二种是随机生成初始化参数，第三种是采用He等的方法进行参数初始化。</p>
+<h2 id="数据集图像"><a href="#数据集图像" class="headerlink" title="数据集图像"></a>数据集图像</h2><p><img src="https://user-images.githubusercontent.com/100786410/158545729-d576ef7d-33cb-481a-92b6-e4cc836360b8.png"></p>
+<p>此分类器的作用是从红点中分离处蓝点</p>
+<h2 id="1-初始化参数为0（Zeros-initialization-–-setting-initialization-x3D-“zeros”-in-the-input-argument）"><a href="#1-初始化参数为0（Zeros-initialization-–-setting-initialization-x3D-“zeros”-in-the-input-argument）" class="headerlink" title="1.初始化参数为0（Zeros initialization – setting initialization = “zeros” in the input argument）"></a>1.初始化参数为0（Zeros initialization – setting initialization = “zeros” in the input argument）</h2><h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def initialize_parameters_zeros(layers_dims):</span><br><span class="line">    parameters = {}</span><br><span class="line">    L = len(layers_dims)</span><br><span class="line">    for l in range(1, L):</span><br><span class="line">        parameters['W'+str(l)]=np.zeros((layers_dims[l],layers_dims[l-1]))</span><br><span class="line">        parameters['b'+str(l)]=np.zeros((layers_dims[l],1))</span><br><span class="line">    return parameters</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="数据"><a href="#数据" class="headerlink" title="数据"></a>数据</h3><blockquote>
+<p>Cost after iteration 0: 0.6931471805599453</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 1000: 0.6931471805599453</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 2000: 0.6931471805599453</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 3000: 0.6931471805599453</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 4000: 0.6931471805599453</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 5000: 0.6931471805599453</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 6000: 0.6931471805599453</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 7000: 0.6931471805599453</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 8000: 0.6931471805599453</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 9000: 0.6931471805599453</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 10000: 0.6931471805599455</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 11000: 0.6931471805599453</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 12000: 0.6931471805599453</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 13000: 0.6931471805599453</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 14000: 0.6931471805599453</p>
+</blockquote>
+<blockquote>
+<p>On the train set:<br>Accuracy: 0.5<br>On the test set:<br>Accuracy: 0.5</p>
+</blockquote>
+<h2 id="成本函数变化曲线"><a href="#成本函数变化曲线" class="headerlink" title="成本函数变化曲线"></a>成本函数变化曲线</h2><p><img src="https://user-images.githubusercontent.com/100786410/158544470-eefa2bbd-dd52-443f-85d6-d81ae04b006f.png"></p>
+<h2 id="预测结果及分析"><a href="#预测结果及分析" class="headerlink" title="预测结果及分析"></a>预测结果及分析</h2><p><img src="https://user-images.githubusercontent.com/100786410/158551051-b48e49b2-32cc-4014-8884-172abc8fa1b2.png" alt="image"></p>
+<p><img src="https://user-images.githubusercontent.com/100786410/158547871-74a64ba6-b98f-4417-8bb8-1b0cd599b593.png" alt="image"></p>
+<p>可以看到不管是训练集还是测试集，所有的预测结果都是0，然而这是为什么呢？</p>
+<p><img src="https://user-images.githubusercontent.com/100786410/158547408-9608fde7-fddf-42f9-b44d-0c9beed4545b.png" alt="3"></p>
+<p>假设训练集中只一个样本，如图中方式计算得到y_pred=0.5,此时不论真时的y值为1还是为0，所得损失函数都是0.6931471805599453。因此，权重无法得到调整，所以成本函数变化曲线也为一条直线（并未呈现梯度下降的趋势）。且在预测函数中设置了当y_pred&gt;0.5时，预测值为1，所以预测结果也圈为0。<br>初始化参数为0，使隐藏层个单元之间呈现处对称状态，根据其反向传播计算公式发现，此时单一隐藏层各单元均在做相同的运算，相当于一个像logistic一样的线性分类器。</p>
+<h2 id="2-随机初始化（Random-Initialization）"><a href="#2-随机初始化（Random-Initialization）" class="headerlink" title="2.随机初始化（Random Initialization）"></a>2.随机初始化（Random Initialization）</h2><p>为了打破单一隐藏层单元做同样运算的这种对称模式，采用对参数进行随机初始化。</p>
+<h3 id="代码-1"><a href="#代码-1" class="headerlink" title="代码"></a>代码</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">def initialize_parameters_random(layers_dims):</span><br><span class="line">    </span><br><span class="line">    np.random.seed(3)               # This seed makes sure your "random" numbers will be the as ours</span><br><span class="line">    parameters = {}</span><br><span class="line">    L = len(layers_dims)            # integer representing the number of layers</span><br><span class="line">    </span><br><span class="line">    for l in range(1, L):</span><br><span class="line">        parameters['W'+str(l)]=np.random.randn(layers_dims[l],layers_dims[l-1])*10                        #乘10以放大初始值，以体现较大初始参数的影响（通常乘0.01）</span><br><span class="line">        parameters['b'+str(l)]=np.zeros((layers_dims[l],1))</span><br><span class="line">    return parameters</span><br></pre></td></tr></tbody></table></figure>
+<h3 id="数据-1"><a href="#数据-1" class="headerlink" title="数据"></a>数据</h3><blockquote>
+<p>Cost after iteration 0: inf</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 1000: 0.6247924745506072</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 2000: 0.5980258056061102</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 3000: 0.5637539062842213</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 4000: 0.5501256393526495</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 5000: 0.5443826306793814</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 6000: 0.5373895855049121</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 7000: 0.47157999220550006</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 8000: 0.39770475516243037</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 9000: 0.3934560146692851</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 10000: 0.3920227137490125</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 11000: 0.38913700035966736</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 12000: 0.3861358766546214</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 13000: 0.38497629552893475</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 14000: 0.38276694641706693</p>
+</blockquote>
+<blockquote>
+<p>On the train set:<br>Accuracy: 0.83<br>On the test set:<br>Accuracy: 0.86</p>
+</blockquote>
+<p>inf代表正无穷（<strong>刚开始时，由于将初始权重值取很大，所以导致a^[3]的值很接近0或1，而一旦预测出错就会导致成本函数很大，例如y=1,而y_pred却接近于0时，loss function=-log(y_pred)，其值同样趋近于无穷</strong>），-inf代表负无穷，<br>从数据中可以看出准确率有了提升</p>
+<h2 id="成本函数变化曲线-1"><a href="#成本函数变化曲线-1" class="headerlink" title="成本函数变化曲线"></a>成本函数变化曲线</h2><p><img src="https://user-images.githubusercontent.com/100786410/158581730-77d1f1c9-a951-4918-8e25-9944b20a565c.png" alt="image"></p>
+<p>可以看到图中曲线呈下降趋势</p>
+<h2 id="预测结果及分析-1"><a href="#预测结果及分析-1" class="headerlink" title="预测结果及分析"></a>预测结果及分析</h2><p><img src="https://user-images.githubusercontent.com/100786410/158583211-c8b3a4ff-a703-4b1a-a1f8-33fe66ae3487.png" alt="image"></p>
+<p><img src="https://user-images.githubusercontent.com/100786410/158583147-1cc092ca-14e4-41a9-8b4c-2d2a05557fd2.png" alt="image"></p>
+<p>从图中可以看到由于打破了对称的影响，不论是训练集还是测试机其预测得出的矩阵中元素也不再全为0了。且在点的分布图中也出现了决策边界，虽然还并不是很准确。<strong>但通过更多时间的训练也能达到较好的效果</strong></p>
+<p>不好的初始化会导致梯度<strong>消失/爆炸</strong>，并且也会减缓优化算法的速度。</p>
+<h2 id="3-He初始化（He-Initialization）"><a href="#3-He初始化（He-Initialization）" class="headerlink" title="3.He初始化（He Initialization）"></a>3.He初始化（He Initialization）</h2><p>He初始化是由He et al.在2015年提出，并以作者的姓氏命名。其与”Xavier initialization”非常相似，”Xavier initialization”中权重的缩放因子为sqrt(1./layers_dims[l-1])，而在”He Initialization”中为sqrt(2./layers_dims[l-1])</p>
+<h3 id="代码-2"><a href="#代码-2" class="headerlink" title="代码"></a>代码</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">def initialize_parameters_he(layers_dims):</span><br><span class="line">    np.random.seed(3)</span><br><span class="line">    parameters = {}</span><br><span class="line">    L = len(layers_dims) - 1 # integer representing the number of layers</span><br><span class="line">     </span><br><span class="line">    for l in range(1, L + 1):</span><br><span class="line">        parameters['W'+str(l)]=np.random.randn(layers_dims[l],layers_dims[l-1])*(np.sqrt(2./layers_dims[l-1]))</span><br><span class="line">        parameters['b'+str(l)]=np.zeros((layers_dims[l],1))</span><br><span class="line">        </span><br><span class="line">    return parameters</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="数据-2"><a href="#数据-2" class="headerlink" title="数据"></a>数据</h3><blockquote>
+<p>Cost after iteration 0: 0.8830537463419761</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 1000: 0.6879825919728063</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 2000: 0.6751286264523371</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 3000: 0.6526117768893805</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 4000: 0.6082958970572938</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 5000: 0.5304944491717495</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 6000: 0.4138645817071794</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 7000: 0.3117803464844441</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 8000: 0.23696215330322562</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 9000: 0.1859728720920684</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 10000: 0.15015556280371808</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 11000: 0.12325079292273551</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 12000: 0.09917746546525937</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 13000: 0.08457055954024283</p>
+</blockquote>
+<blockquote>
+<p>Cost after iteration 14000: 0.07357895962677366</p>
+</blockquote>
+<blockquote>
+<p>On the train set:<br>Accuracy: 0.9933333333333333<br>On the test set:<br>Accuracy: 0.96</p>
+</blockquote>
+<p>相比于随机初始化，迭代次数相同时，He初始化所计算出的成本函数会小很多，且准确率也要高很多</p>
+<h3 id="成本函数变化曲线-2"><a href="#成本函数变化曲线-2" class="headerlink" title="成本函数变化曲线"></a>成本函数变化曲线</h3><p><img src="https://user-images.githubusercontent.com/100786410/158590313-13886a37-8533-4f46-a873-a3fe5891b1a0.png" alt="image"></p>
+<h3 id="预测结果及分析-2"><a href="#预测结果及分析-2" class="headerlink" title="预测结果及分析"></a>预测结果及分析</h3><p><img src="https://user-images.githubusercontent.com/100786410/158590590-f8f58161-f022-4916-ac06-93673e0d61fa.png" alt="image"></p>
+<p>可以看到，利用He初始化可以得到很好的决策边界</p>
+<h1 id="正则化"><a href="#正则化" class="headerlink" title="正则化"></a>正则化</h1><p>对于深度学习模型的过拟合(高方差，high variance)的问题，可以采用扩大训练集的方法来解决，但有时想要获得更多的数据集也不是一件易事。这是，可以采用正则化的方法来解决过拟合的问题。<br>此处以踢足球问题为例，图中显示双方球员的位置，请给出蓝色方守门员建议，将球踢到球场某处以便其队员能更好地用头击球。</p>
+<p><img src="https://user-images.githubusercontent.com/100786410/158593623-ebe7ce14-b861-4f98-ab47-8aafcb3e6ffb.png" alt="image"></p>
+<p><img src="https://user-images.githubusercontent.com/100786410/158593755-444f3c32-9457-4769-b01f-ede1f9443e3f.png" alt="image"></p>
+<p>蓝点代表在此处蓝队球员击球，红点代表此处红队球员击球。从图中可以看出，此问题存在噪声问题，但可以通过正则化的方法来避免过拟合，以得到更好的结果。此处将讨论L2 regularization 以及 dropout 方法</p>
+<p>这里同样采用三层神经网络，首先建立一个整体框架，在这个框架中可以通过改变lambd以及keep_prob（代表了每一层中保留单元的概率）的值来控制是否采用L2 regularization或是dropout。</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">def model(X, Y, learning_rate = 0.3, num_iterations = 30000, print_cost = True, lambd = 0, keep_prob = 1):</span><br><span class="line">    """</span><br><span class="line">    Implements a three-layer neural network: LINEAR-&gt;RELU-&gt;LINEAR-&gt;RELU-&gt;LINEAR-&gt;SIGMOID.</span><br><span class="line">    </span><br><span class="line">    Arguments:</span><br><span class="line">    X -- input data, of shape (input size, number of examples)</span><br><span class="line">    Y -- true "label" vector (1 for blue dot / 0 for red dot), of shape (output size, number of examples)</span><br><span class="line">    learning_rate -- learning rate of the optimization</span><br><span class="line">    num_iterations -- number of iterations of the optimization loop</span><br><span class="line">    print_cost -- If True, print the cost every 10000 iterations</span><br><span class="line">    lambd -- regularization hyperparameter, scalar</span><br><span class="line">    keep_prob - probability of keeping a neuron active during drop-out, scalar.</span><br><span class="line">    </span><br><span class="line">    Returns:</span><br><span class="line">    parameters -- parameters learned by the model. They can then be used to predict.</span><br><span class="line">    """</span><br><span class="line">        </span><br><span class="line">    grads = {}</span><br><span class="line">    costs = []                            # to keep track of the cost</span><br><span class="line">    m = X.shape[1]                        # number of examples</span><br><span class="line">    layers_dims = [X.shape[0], 20, 3, 1]</span><br><span class="line">    </span><br><span class="line">    # Initialize parameters dictionary.</span><br><span class="line">    parameters = initialize_parameters(layers_dims)</span><br><span class="line"></span><br><span class="line">    # Loop (gradient descent)</span><br><span class="line"></span><br><span class="line">    for i in range(0, num_iterations):</span><br><span class="line"></span><br><span class="line">        # Forward propagation: LINEAR -&gt; RELU -&gt; LINEAR -&gt; RELU -&gt; LINEAR -&gt; SIGMOID.</span><br><span class="line">        if keep_prob == 1:</span><br><span class="line">            a3, cache = forward_propagation(X, parameters)</span><br><span class="line">        elif keep_prob &lt; 1:</span><br><span class="line">            a3, cache = forward_propagation_with_dropout(X, parameters, keep_prob)</span><br><span class="line">        </span><br><span class="line">        # Cost function</span><br><span class="line">        if lambd == 0:</span><br><span class="line">            cost = compute_cost(a3, Y)</span><br><span class="line">        else:</span><br><span class="line">            cost = compute_cost_with_regularization(a3, Y, parameters, lambd)</span><br><span class="line">            </span><br><span class="line">        # Backward propagation.</span><br><span class="line">        assert (lambd == 0 or keep_prob == 1)   # it is possible to use both L2 regularization and dropout, </span><br><span class="line">                                                # but this assignment will only explore one at a time</span><br><span class="line">        if lambd == 0 and keep_prob == 1:</span><br><span class="line">            grads = backward_propagation(X, Y, cache)</span><br><span class="line">        elif lambd != 0:</span><br><span class="line">            grads = backward_propagation_with_regularization(X, Y, cache, lambd)</span><br><span class="line">        elif keep_prob &lt; 1:</span><br><span class="line">            grads = backward_propagation_with_dropout(X, Y, cache, keep_prob)</span><br><span class="line">        </span><br><span class="line">        # Update parameters.</span><br><span class="line">        parameters = update_parameters(parameters, grads, learning_rate)</span><br><span class="line">        </span><br><span class="line">        # Print the loss every 10000 iterations</span><br><span class="line">        if print_cost and i % 10000 == 0:</span><br><span class="line">            print("Cost after iteration {}: {}".format(i, cost))</span><br><span class="line">        if print_cost and i % 1000 == 0:</span><br><span class="line">            costs.append(cost)</span><br><span class="line">    </span><br><span class="line">    # plot the cost</span><br><span class="line">    plt.plot(costs)</span><br><span class="line">    plt.ylabel('cost')</span><br><span class="line">    plt.xlabel('iterations (x1,000)')</span><br><span class="line">    plt.title("Learning rate =" + str(learning_rate))</span><br><span class="line">    plt.show()</span><br><span class="line">    </span><br><span class="line">    return parameters</span><br></pre></td></tr></tbody></table></figure>
+
+<p>从代码中可以知道L2 reglarization只设计成本函数的计算和反向传播部分，不涉及正向传播过程。而dropout方法从正向传播起便开始作用</p>
+<h3 id="代码-3"><a href="#代码-3" class="headerlink" title="代码"></a>代码</h3><h4 id="L2-regularization"><a href="#L2-regularization" class="headerlink" title="L2 regularization"></a>L2 regularization</h4><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">def compute_cost_with_regularization(A3, Y, parameters, lambd):</span><br><span class="line">    """</span><br><span class="line">    Implement the cost function with L2 regularization. See formula (2) above.</span><br><span class="line">    </span><br><span class="line">    Arguments:</span><br><span class="line">    A3 -- post-activation, output of forward propagation, of shape (output size, number of examples)</span><br><span class="line">    Y -- "true" labels vector, of shape (output size, number of examples)</span><br><span class="line">    parameters -- python dictionary containing parameters of the model</span><br><span class="line">    </span><br><span class="line">    Returns:</span><br><span class="line">    cost - value of the regularized loss function (formula (2))</span><br><span class="line">    """</span><br><span class="line">    m = Y.shape[1]</span><br><span class="line">    W1 = parameters["W1"]</span><br><span class="line">    W2 = parameters["W2"]</span><br><span class="line">    W3 = parameters["W3"]</span><br><span class="line">    </span><br><span class="line">    cross_entropy_cost = compute_cost(A3, Y) # This gives you the cross-entropy part of the cost</span><br><span class="line">    </span><br><span class="line">    #(≈ 1 lines of code)</span><br><span class="line">    # L2_regularization_cost = </span><br><span class="line">    # YOUR CODE STARTS HERE</span><br><span class="line">    L2_regularization_cost=lambd/(2*m)*(np.sum(np.square(W1))+np.sum(np.square(W2))+np.sum(np.square(W3)))</span><br><span class="line">    </span><br><span class="line">    # YOUR CODE ENDS HERE</span><br><span class="line">    </span><br><span class="line">    cost = cross_entropy_cost + L2_regularization_cost</span><br><span class="line">    </span><br><span class="line">    return cost</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def backward_propagation_with_regularization(X, Y, cache, lambd):</span><br><span class="line">    """</span><br><span class="line">    Implements the backward propagation of our baseline model to which we added an L2 regularization.</span><br><span class="line">    </span><br><span class="line">    Arguments:</span><br><span class="line">    X -- input dataset, of shape (input size, number of examples)</span><br><span class="line">    Y -- "true" labels vector, of shape (output size, number of examples)</span><br><span class="line">    cache -- cache output from forward_propagation()</span><br><span class="line">    lambd -- regularization hyperparameter, scalar</span><br><span class="line">    </span><br><span class="line">    Returns:</span><br><span class="line">    gradients -- A dictionary with the gradients with respect to each parameter, activation and pre-activation variables</span><br><span class="line">    """</span><br><span class="line">    </span><br><span class="line">    m = X.shape[1]</span><br><span class="line">    (Z1, A1, W1, b1, Z2, A2, W2, b2, Z3, A3, W3, b3) = cache</span><br><span class="line">    </span><br><span class="line">    dZ3 = A3 - Y</span><br><span class="line">    #(≈ 1 lines of code)</span><br><span class="line">    # dW3 = 1./m * np.dot(dZ3, A2.T) + None</span><br><span class="line">    # YOUR CODE STARTS HERE</span><br><span class="line">    dW3=1./m*np.dot(dZ3,A2.T)+(lambd/m*W3)</span><br><span class="line">    </span><br><span class="line">    # YOUR CODE ENDS HERE</span><br><span class="line">    db3 = 1. / m * np.sum(dZ3, axis=1, keepdims=True)</span><br><span class="line">    </span><br><span class="line">    dA2 = np.dot(W3.T, dZ3)</span><br><span class="line">    dZ2 = np.multiply(dA2, np.int64(A2 &gt; 0))</span><br><span class="line">    #(≈ 1 lines of code)</span><br><span class="line">    # dW2 = 1./m * np.dot(dZ2, A1.T) + None</span><br><span class="line">    # YOUR CODE STARTS HERE</span><br><span class="line">    dW2 = 1./m*np.dot(dZ2,A1.T)+(lambd/m*W2)</span><br><span class="line">    </span><br><span class="line">    # YOUR CODE ENDS HERE</span><br><span class="line">    db2 = 1. / m * np.sum(dZ2, axis=1, keepdims=True)</span><br><span class="line">    </span><br><span class="line">    dA1 = np.dot(W2.T, dZ2)</span><br><span class="line">    dZ1 = np.multiply(dA1, np.int64(A1 &gt; 0))</span><br><span class="line">    #(≈ 1 lines of code)</span><br><span class="line">    # dW1 = 1./m * np.dot(dZ1, X.T) + None</span><br><span class="line">    # YOUR CODE STARTS HERE</span><br><span class="line">    dW1 = 1./m*np.dot(dZ1,X.T)+(lambd/m*W1)</span><br><span class="line">    </span><br><span class="line">    # YOUR CODE ENDS HERE</span><br><span class="line">    db1 = 1. / m * np.sum(dZ1, axis=1, keepdims=True)</span><br><span class="line">    </span><br><span class="line">    gradients = {"dZ3": dZ3, "dW3": dW3, "db3": db3,"dA2": dA2,</span><br><span class="line">                 "dZ2": dZ2, "dW2": dW2, "db2": db2, "dA1": dA1, </span><br><span class="line">                 "dZ1": dZ1, "dW1": dW1, "db1": db1}</span><br><span class="line">    </span><br><span class="line">    return gradients</span><br></pre></td></tr></tbody></table></figure>
+<h4 id="Dropout"><a href="#Dropout" class="headerlink" title="Dropout"></a>Dropout</h4><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><span class="line">def forward_propagation_with_dropout(X, parameters, keep_prob = 0.5):</span><br><span class="line">    """</span><br><span class="line">    Implements the forward propagation: LINEAR -&gt; RELU + DROPOUT -&gt; LINEAR -&gt; RELU + DROPOUT -&gt; LINEAR -&gt; SIGMOID.</span><br><span class="line">    </span><br><span class="line">    Arguments:</span><br><span class="line">    X -- input dataset, of shape (2, number of examples)</span><br><span class="line">    parameters -- python dictionary containing your parameters "W1", "b1", "W2", "b2", "W3", "b3":</span><br><span class="line">                    W1 -- weight matrix of shape (20, 2)</span><br><span class="line">                    b1 -- bias vector of shape (20, 1)</span><br><span class="line">                    W2 -- weight matrix of shape (3, 20)</span><br><span class="line">                    b2 -- bias vector of shape (3, 1)</span><br><span class="line">                    W3 -- weight matrix of shape (1, 3)</span><br><span class="line">                    b3 -- bias vector of shape (1, 1)</span><br><span class="line">    keep_prob - probability of keeping a neuron active during drop-out, scalar</span><br><span class="line">    </span><br><span class="line">    Returns:</span><br><span class="line">    A3 -- last activation value, output of the forward propagation, of shape (1,1)</span><br><span class="line">    cache -- tuple, information stored for computing the backward propagation</span><br><span class="line">    """</span><br><span class="line">    </span><br><span class="line">    np.random.seed(1)</span><br><span class="line">    </span><br><span class="line">    # retrieve parameters</span><br><span class="line">    W1 = parameters["W1"]</span><br><span class="line">    b1 = parameters["b1"]</span><br><span class="line">    W2 = parameters["W2"]</span><br><span class="line">    b2 = parameters["b2"]</span><br><span class="line">    W3 = parameters["W3"]</span><br><span class="line">    b3 = parameters["b3"]</span><br><span class="line">    </span><br><span class="line">    # LINEAR -&gt; RELU -&gt; LINEAR -&gt; RELU -&gt; LINEAR -&gt; SIGMOID</span><br><span class="line">    Z1 = np.dot(W1, X) + b1</span><br><span class="line">    A1 = relu(Z1)</span><br><span class="line">    #(≈ 4 lines of code)         # Steps 1-4 below correspond to the Steps 1-4 described above. </span><br><span class="line">    # D1 =                                           # Step 1: initialize matrix D1 = np.random.rand(..., ...)</span><br><span class="line">    # D1 =                                           # Step 2: convert entries of D1 to 0 or 1 (using keep_prob as the threshold)</span><br><span class="line">    # A1 =                                           # Step 3: shut down some neurons of A1</span><br><span class="line">    # A1 =                                           # Step 4: scale the value of neurons that haven't been shut down</span><br><span class="line">    # YOUR CODE STARTS HERE</span><br><span class="line">    D1=np.random.rand(W1.shape[0],X.shape[1])</span><br><span class="line">    D1=(D1&lt;keep_prob).astype(int)</span><br><span class="line">    A1=np.multiply(A1,D1)</span><br><span class="line">    A1=A1/keep_prob</span><br><span class="line">    # YOUR CODE ENDS HERE</span><br><span class="line">    Z2 = np.dot(W2, A1) + b2</span><br><span class="line">    A2 = relu(Z2)</span><br><span class="line">    #(≈ 4 lines of code)</span><br><span class="line">    # D2 =                                           # Step 1: initialize matrix D2 = np.random.rand(..., ...)</span><br><span class="line">    # D2 =                                           # Step 2: convert entries of D2 to 0 or 1 (using keep_prob as the threshold)</span><br><span class="line">    # A2 =                                           # Step 3: shut down some neurons of A2</span><br><span class="line">    # A2 =                                           # Step 4: scale the value of neurons that haven't been shut down</span><br><span class="line">    # YOUR CODE STARTS HERE</span><br><span class="line">    D2=np.random.rand(W2.shape[0],X.shape[1])</span><br><span class="line">    D2=(D2&lt;keep_prob).astype(int)</span><br><span class="line">    A2=np.multiply(A2,D2)</span><br><span class="line">    A2=A2/keep_prob</span><br><span class="line">    # YOUR CODE ENDS HERE</span><br><span class="line">    Z3 = np.dot(W3, A2) + b3</span><br><span class="line">    A3 = sigmoid(Z3)</span><br><span class="line">    </span><br><span class="line">    cache = (Z1, D1, A1, W1, b1, Z2, D2, A2, W2, b2, Z3, A3, W3, b3)</span><br><span class="line">    </span><br><span class="line">    return A3, cache</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def backward_propagation_with_dropout(X, Y, cache, keep_prob):</span><br><span class="line">    """</span><br><span class="line">    Implements the backward propagation of our baseline model to which we added dropout.</span><br><span class="line">    </span><br><span class="line">    Arguments:</span><br><span class="line">    X -- input dataset, of shape (2, number of examples)</span><br><span class="line">    Y -- "true" labels vector, of shape (output size, number of examples)</span><br><span class="line">    cache -- cache output from forward_propagation_with_dropout()</span><br><span class="line">    keep_prob - probability of keeping a neuron active during drop-out, scalar</span><br><span class="line">    </span><br><span class="line">    Returns:</span><br><span class="line">    gradients -- A dictionary with the gradients with respect to each parameter, activation and pre-activation variables</span><br><span class="line">    """</span><br><span class="line">    </span><br><span class="line">    m = X.shape[1]</span><br><span class="line">    (Z1, D1, A1, W1, b1, Z2, D2, A2, W2, b2, Z3, A3, W3, b3) = cache</span><br><span class="line">    </span><br><span class="line">    dZ3 = A3 - Y</span><br><span class="line">    dW3 = 1./m * np.dot(dZ3, A2.T)</span><br><span class="line">    db3 = 1./m * np.sum(dZ3, axis=1, keepdims=True)</span><br><span class="line">    dA2 = np.dot(W3.T, dZ3)</span><br><span class="line">    #(≈ 2 lines of code)</span><br><span class="line">    # dA2 =                # Step 1: Apply mask D2 to shut down the same neurons as during the forward propagation</span><br><span class="line">    # dA2 =                # Step 2: Scale the value of neurons that haven't been shut down</span><br><span class="line">    # YOUR CODE STARTS HERE</span><br><span class="line">    dA2=np.multiply(dA2,D2)</span><br><span class="line">    dA2=dA2/keep_prob</span><br><span class="line">    # YOUR CODE ENDS HERE</span><br><span class="line">    dZ2 = np.multiply(dA2, np.int64(A2 &gt; 0))</span><br><span class="line">    dW2 = 1./m * np.dot(dZ2, A1.T)</span><br><span class="line">    db2 = 1./m * np.sum(dZ2, axis=1, keepdims=True)</span><br><span class="line">    </span><br><span class="line">    dA1 = np.dot(W2.T, dZ2)</span><br><span class="line">    #(≈ 2 lines of code)</span><br><span class="line">    # dA1 =                # Step 1: Apply mask D1 to shut down the same neurons as during the forward propagation</span><br><span class="line">    # dA1 =                # Step 2: Scale the value of neurons that haven't been shut down</span><br><span class="line">    # YOUR CODE STARTS HERE</span><br><span class="line">    dA1=np.multiply(dA1,D1)</span><br><span class="line">    dA1=dA1/keep_prob</span><br><span class="line">    # YOUR CODE ENDS HERE</span><br><span class="line">    dZ1 = np.multiply(dA1, np.int64(A1 &gt; 0))</span><br><span class="line">    dW1 = 1./m * np.dot(dZ1, X.T)</span><br><span class="line">    db1 = 1./m * np.sum(dZ1, axis=1, keepdims=True)</span><br><span class="line">    </span><br><span class="line">    gradients = {"dZ3": dZ3, "dW3": dW3, "db3": db3,"dA2": dA2,</span><br><span class="line">                 "dZ2": dZ2, "dW2": dW2, "db2": db2, "dA1": dA1, </span><br><span class="line">                 "dZ1": dZ1, "dW1": dW1, "db1": db1}</span><br><span class="line">    </span><br><span class="line">    return gradients</span><br></pre></td></tr></tbody></table></figure>
+<p>注意dropout在反向传播阶段同样需要/keep_prob</p>
+<h3 id="结果及分析"><a href="#结果及分析" class="headerlink" title="结果及分析"></a>结果及分析</h3><h4 id="不采用正则化"><a href="#不采用正则化" class="headerlink" title="不采用正则化"></a>不采用正则化</h4><p><img src="https://user-images.githubusercontent.com/100786410/158607986-079906d1-527c-4a16-9f30-c1aab747837c.png" alt="image"></p>
+<p><img src="https://user-images.githubusercontent.com/100786410/158608174-c95d473e-c904-41fb-91c8-6db1f713a0f3.png" alt="image"></p>
+<h4 id="L2-regularization-1"><a href="#L2-regularization-1" class="headerlink" title="L2 regularization"></a>L2 regularization</h4><p>lambd=0.7</p>
+<p><img src="https://user-images.githubusercontent.com/100786410/158605029-43b727b8-83ef-48a9-ad8a-3e53807a600a.png" alt="image"></p>
+<p><img src="https://user-images.githubusercontent.com/100786410/158605811-457381e8-6acc-4407-b84d-4c9dbf520e5f.png" alt="image"></p>
+<h4 id="Dropout-1"><a href="#Dropout-1" class="headerlink" title="Dropout"></a>Dropout</h4><p>keep_prob=0.87</p>
+<p><img src="https://user-images.githubusercontent.com/100786410/158606077-01040ee8-5556-4688-9453-0605b8d00a4b.png" alt="image"></p>
+<p><img src="https://user-images.githubusercontent.com/100786410/158606244-4986af45-0c85-4362-a5df-4477552baa96.png" alt="image"></p>
+<p>dropout 不能在测试集中使用，因为在测试阶段我门不希望输出的函数值是随机的，也不用再/=keep_prob，因为在训练集中做过此处理，所以训练集输出值的期望并未减小</p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">LZ</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="http://example.com/2022/03/16/gai-shan-shen-jing-wang-luo-chao-can-shu-diao-shi-zheng-ze-hua-yi-ji-you-hua/">http://example.com/2022/03/16/gai-shan-shen-jing-wang-luo-chao-can-shu-diao-shi-zheng-ze-hua-yi-ji-you-hua/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">LZ</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/deep-learning/">
+                                    <span class="chip bg-color">deep learning</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.png" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2022/03/16/gai-shan-shen-jing-wang-luo-chao-can-shu-diao-shi-zheng-ze-hua-yi-ji-you-hua/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="改善神经网络：超参数调试、正则化以及优化">
+                        
+                        <span class="card-title">改善神经网络：超参数调试、正则化以及优化</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2022-03-16
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            LZ
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/deep-learning/">
+                        <span class="chip bg-color">deep learning</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2022/03/08/matplotlib-pyplot/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/20.jpg" class="responsive-img" alt="matplotlib.pyplot">
+                        
+                        <span class="card-title">matplotlib.pyplot</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2022-03-08
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            Lz
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/python/">
+                        <span class="chip bg-color">python</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="7217560481"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="/libs/aplayer/Meting.min.js"></script>
+
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 15px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2022</span>
+            
+            <a href="/about" target="_blank">Lz</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">3.3k</span>
+            
+            
+            
+                
+            
+            
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
+            </span>
+            
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+                <span id="sitetime"> Loading ...</span>
+                <script>
+                    var calcSiteTime = function () {
+                        var seconds = 1000;
+                        var minutes = seconds * 60;
+                        var hours = minutes * 60;
+                        var days = hours * 24;
+                        var years = days * 365;
+                        var today = new Date();
+                        var startYear = "2022";
+                        var startMonth = "3";
+                        var startDate = "5";
+                        var startHour = "0";
+                        var startMinute = "0";
+                        var startSecond = "0";
+                        var todayYear = today.getFullYear();
+                        var todayMonth = today.getMonth() + 1;
+                        var todayDate = today.getDate();
+                        var todayHour = today.getHours();
+                        var todayMinute = today.getMinutes();
+                        var todaySecond = today.getSeconds();
+                        var t1 = Date.UTC(startYear, startMonth, startDate, startHour, startMinute, startSecond);
+                        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+                        var diff = t2 - t1;
+                        var diffYears = Math.floor(diff / years);
+                        var diffDays = Math.floor((diff / days) - diffYears * 365);
+
+                        // 区分是否有年份.
+                        var language = 'zh-CN';
+                        if (startYear === String(todayYear)) {
+                            document.getElementById("year").innerHTML = todayYear;
+                            var daysTip = 'This site has been running for ' + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                daysTip = '本站已运行 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                daysTip = '本站已運行 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = daysTip;
+                        } else {
+                            document.getElementById("year").innerHTML = startYear + " - " + todayYear;
+                            var yearsAndDaysTip = 'This site has been running for ' + diffYears + ' years and '
+                                + diffDays + ' days';
+                            if (language === 'zh-CN') {
+                                yearsAndDaysTip = '本站已运行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            } else if (language === 'zh-HK') {
+                                yearsAndDaysTip = '本站已運行 ' + diffYears + ' 年 ' + diffDays + ' 天';
+                            }
+                            document.getElementById("sitetime").innerHTML = yearsAndDaysTip;
+                        }
+                    }
+
+                    calcSiteTime();
+                </script>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/Lz-DX" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1021774729@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1021774729" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1021774729" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+<script language=javascript>
+    function siteTime() {
+        window.setTimeout("siteTime()", 1000);
+        var seconds = 1000;
+        var minutes = seconds * 60;
+        var hours = minutes * 60;
+        var days = hours * 24;
+        var years = days * 365;
+        var today = new Date();
+        var todayYear = today.getFullYear();
+        var todayMonth = today.getMonth() + 1;
+        var todayDate = today.getDate();
+        var todayHour = today.getHours();
+        var todayMinute = today.getMinutes();
+        var todaySecond = today.getSeconds();
+        /* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+        year - 作为date对象的年份，为4位年份值
+        month - 0-11之间的整数，做为date对象的月份
+        day - 1-31之间的整数，做为date对象的天数
+        hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+        minutes - 0-59之间的整数，做为date对象的分钟数
+        seconds - 0-59之间的整数，做为date对象的秒数
+        microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+        var t1 = Date.UTC(2017, 09, 11, 00, 00, 00); // 北京时间2018-2-13 00:00:00
+        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+        var diff = t2 - t1;
+        var diffYears = Math.floor(diff / years);
+        var diffDays = Math.floor((diff / days) - diffYears * 365);
+        var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+        var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) / minutes);
+        var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours - diffMinutes * minutes) / seconds);
+        document.getElementById("sitetime").innerHTML = "本站已运行 " +diffYears+" 年 "+diffDays + " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+    }
+    siteTime();
+</script>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    
+
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="xxxxxxxxxx" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
